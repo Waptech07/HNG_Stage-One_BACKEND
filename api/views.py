@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 import requests
 from urllib.request import urlopen
 import re as r
@@ -29,7 +30,7 @@ class HelloView(APIView):
                 'location': 'Unknown',
                 'greeting': f'Hello, {visitor_name}!, we could not determine your IP address'
             }
-            return Response(response_data)
+            return JsonResponse(response_data)
 
         # Use ipapi to get the location based on IP
         ipapi_url = f'https://ipapi.co/{client_ip}/json/'
@@ -46,8 +47,7 @@ class HelloView(APIView):
 
                 # Get weather data from OpenWeatherMap API
                 weather_api_key = '268178537a976a43f5adc4694c2f80c1'
-                weather_response = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={
-                                                latitude}&lon={longitude}&units=metric&appid={weather_api_key}')
+                weather_response = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={weather_api_key}')
 
                 if weather_response.status_code == 200:
                     # Extract temperature from weather data
@@ -81,4 +81,4 @@ class HelloView(APIView):
                 'greeting': f'Hello, {visitor_name}!, there was an error while fetching data: {str(e)}'
             }
             
-        return Response(response_data)
+        return JsonResponse(response_data)
