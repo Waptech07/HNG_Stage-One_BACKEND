@@ -5,10 +5,19 @@ import requests
 from urllib.request import urlopen
 import re as r
 
-# Create your views here.
 
 class HelloView(APIView):
+    def get_client_ip(self, request):
+        """Retrieve the client's IP address from the request, accounting for proxies."""
+        user_ip = request.META.get('HTTP_X_FORWARDED_FOR')
+        if user_ip:
+            ip = user_ip.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
     def getIP(self):
+        """Retrieve the public IP address of the server."""
         try:
             d = str(urlopen('http://checkip.dyndns.com/').read())
             ip_address = r.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(d).group(1)
@@ -21,7 +30,7 @@ class HelloView(APIView):
         visitor_name = request.GET.get('visitor_name', 'Guest')
 
         # Get client IP address
-        client_ip = self.getIP()
+        client_ip = self.get_client_ip(request)
 
         if not client_ip:
             # Handle case where IP address could not be retrieved
